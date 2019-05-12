@@ -5,7 +5,7 @@ pipeline {
     string(description: '', name: 'branch')
     }
     stages {
-        stage('Example') {
+        stage('Initialize') {
             steps { 
                 git branch: "${params.branch}",
                     url: "${params.git_url}" 
