@@ -31,6 +31,11 @@ try {
 	dir.eachFileRecurse(FILES) {
 		file -> list << file
 	}
+        def params = []
+        gitUrlParam = new StringParameterValue('git_url', gitRepo) 
+        params.add(gitUrlParam)
+        branchParam = new StringParameterValue('branch', gitBranch)
+        params.add(branchParam)
 
 	list.each {
 		println it.name
@@ -38,6 +43,7 @@ try {
 		def job = new WorkflowJob(parent, org.apache.commons.io.FilenameUtils.getBaseName(it.name))
 		job.definition = flowDefinition
 		job.save()
+                job.scheduleBuild2(0, null, new ParametersAction(params))
 	}
 } finally {
         ["rm -rf", cloneDir].join(" ").execute()
