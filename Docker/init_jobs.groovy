@@ -1,5 +1,10 @@
-import hudson.plugins.git. * ;
-import jenkins.model.Jenkins
+import hudson.plugins.git.*;
+import hudson.model.ParametersAction;
+import hudson.model.Result;
+import hudson.model.StringParameterValue;
+import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.authorizeproject.AuthorizeProjectProperty;
+import org.jenkinsci.plugins.authorizeproject.strategy.TriggeringUsersAuthorizationStrategy;
 import org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import static groovy.io.FileType.FILES;
@@ -11,6 +16,7 @@ def scm = new GitSCM(gitRepo)
 scm.branches = [new BranchSpec(gitBranch)];
 def cloneDir = "/tmp/clone/"
 def jobsDir = env.JOBS_SUBDIR ?: "jenkins/jobs/"
+def initJob = env.INIT_JOB ?: "jenkine/init/init_jobs.groovy"
 def parent = Jenkins.instance
 
 try {
@@ -36,16 +42,18 @@ try {
         params.add(gitUrlParam)
         branchParam = new StringParameterValue('branch', gitBranch)
         params.add(branchParam)
+        def flowDefinition = new CpsScmFlowDefinition(scm, initJob)
+        def job = new WorkflowJob(parent, "init")
+        job.definition = flowDefinition
+        job.save()
 
 	list.each {
-		println it.name
-		def flowDefinition = new CpsScmFlowDefinition(scm, jobsDir + it.name)
-		def job = new WorkflowJob(parent, org.apache.commons.io.FilenameUtils.getBaseName(it.name))
-		job.definition = flowDefinition
-		job.save()
-                job.scheduleBuild2(0, null, new ParametersAction(params))
+                def scriptParam new StringParameterValue('scripts', jobsDir+it.name)
+                job.addProperty(new AuthorizeProjectProperty(new TriggeringUsersAuthorizationStrategy()))
+                def result = job.scheduleBuild2(0, null, new ParametersAction(params)).get().result
+                assertEquals(Result.SUCCESS, result)
+                
 	}
 } finally {
         ["rm -rf", cloneDir].join(" ").execute()
-	parent.reload()
 }

@@ -1,17 +1,11 @@
-pipeline {
-    agent any
-    parameters {
-    string(description: '', name: 'git_url')
-    string(description: '', name: 'branch')
+pipelineJob('example2') {
+    triggers {
+        cron('*/15 * * * *')
     }
-    stages {
-        stage('Initialize') {
-            steps { 
-                git branch: "${params.branch}",
-                    url: "${params.git_url}" 
-                jobDsl targets: ["jenkins/pipelines/example2.groovy"].join('\n'),
-                sandbox: true
-            }
+    definition {
+        cps {
+            script(readFileFromWorkspace('jenkins/pipelines/examplexi21.groovy'))
+            sandbox()
         }
     }
 }
