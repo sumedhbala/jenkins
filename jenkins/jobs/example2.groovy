@@ -4,7 +4,7 @@ pipelineJob('example2') {
     }
     definition {
         cps {
-            script(readFileFromWorkspace('jenkins/pipelines/examplexi21.groovy'))
+            script(readFileFromWorkspace('jenkins/pipelines/example2.groovy'))
             sandbox()
         }
     }
