@@ -1,15 +1,12 @@
-pipeline {
-    agent any
-    stages {
-        stage('Example') {
-            steps {
-                echo 'Hello World'
-            }
-        }
+pipelineJob('example2') {
+    triggers {
+        cron('*/15 * * * *')
     }
-    post { 
-        always { 
-            echo 'I will always say Hello again!'
+    definition {
+        cps {
+            script(readFileFromWorkspace('jenkins/pipelines/example2.groovy'))
+            sandbox()
         }
     }
 }
+
