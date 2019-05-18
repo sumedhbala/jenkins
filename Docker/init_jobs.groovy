@@ -21,7 +21,7 @@ def cloneDir = "/tmp/clone/"
 def jobsDir = env.JOBS_SUBDIR ?: "jenkins/jobs/"
 def initJob = env.INIT_JOB ?: "jenkins/init/init_jobs.groovy"
 def parent = Jenkins.instance
-def jobName = "setu8"
+def jobName = "setup"
 try {
         eachCommands = [["mkdir -p ", cloneDir], ["git", "clone", "--depth 1", gitRepo, "-b", gitBranch, cloneDir]]
         eachCommands.each {
